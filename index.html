@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tap Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tap Game</h1>
+    <p id="score">Your Score: 0</p>
+    <button onclick="tap()">Tap!</button>
+    <button onclick="showTop()">Show Top Players</button>
+    <div id="topPlayers"></div>
+
+    <script>
+        let user_id = null;
+        let username = null;
+
+        // Initialize with Telegram WebApp data
+        Telegram.WebApp.ready();
+
+        Telegram.WebApp.onEvent('mainButtonClicked', function() {
+            const initDataUnsafe = Telegram.WebApp.initDataUnsafe;
+            user_id = initDataUnsafe.user.id;
+            username = initDataUnsafe.user.username;
+
+            fetch('/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id, username })
+            });
+        });
+
+        function tap() {
+            fetch('/tap', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('score').innerText = `Your Score: ${data.score}`;
+            });
+        }
+
+        function showTop() {
+            fetch('/top')
+            .then(response => response.json())
+            .then(data => {
+                const topPlayersDiv = document.getElementById('topPlayers');
+                topPlayersDiv.innerHTML = '<h2>Top Players:</h2><ul>' + data.map(player => `<li>${player[0]}: ${player[1]}</li>`).join('') + '</ul>';
+            });
+        }
+    </script>
+</body>
+</html>
