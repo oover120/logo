@@ -35,22 +35,21 @@
         // Initialize with Telegram WebApp data
         Telegram.WebApp.ready();
 
-        Telegram.WebApp.onEvent('mainButtonClicked', function() {
-            const initDataUnsafe = Telegram.WebApp.initDataUnsafe;
-            user_id = initDataUnsafe.user.id;
-            username = initDataUnsafe.user.username;
+        const initDataUnsafe = Telegram.WebApp.initDataUnsafe;
+        user_id = initDataUnsafe.user.id;
+        username = initDataUnsafe.user.username;
 
-            fetch('/start', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ user_id, username })
-            });
+        // Automatically start game when the Web App is opened
+        fetch('http://localhost:5000/start', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ user_id, username })
         });
 
         function tap() {
-            fetch('/tap', {
+            fetch('http://localhost:5000/tap', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -64,7 +63,7 @@
         }
 
         function showTop() {
-            fetch('/top')
+            fetch('https://185.101.94.186:5000/top')
             .then(response => response.json())
             .then(data => {
                 const topPlayersDiv = document.getElementById('topPlayers');
